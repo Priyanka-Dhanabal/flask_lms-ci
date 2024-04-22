@@ -1,9 +1,17 @@
 import os
 import json
-from flask import Flask, render_template # render_template to import files into the website
+from flask import Flask, render_template, request, flash 
+# render_template to import files into the website
+# request library will handle things like finding out what methos was used and it will contain the form object when we have posted it.
+# flash : we want to display a non-permanent message to the user, something that only stay on screen until we refresh the page, or go to a different one.
+# These are called 'flashed messages' in Flask.  we need to create a secret key, because Flask cryptographically signs all of the messages for security purposes.
+
+if os.path.exists("env.py"):
+    import env
 
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY")
 
 
 @app.route("/")
@@ -33,8 +41,14 @@ def about_member(member_name):
     # The second 'member' is the member object we created above on line 24.
 
 
-@app.route("/contact")
+@app.route("/contact", methods=["GET", "POST"]) #we need to explicitly state that our route can accept those methods. by default it has only get method.
 def contact():
+    if request.method =="POST":
+        # print(request.form)
+        # print(request.form.get("name"))
+        # print(request.form["email"])
+        flash("Thanks {}, we have received your message!".format(
+            request.form.get("name")))
     return render_template("contact.html", page_title="Contact")
 
 
